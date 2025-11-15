@@ -90,7 +90,7 @@ function formatCat(cat) {
         fours: "Fours",
         fives: "Fives",
         sixes: "Sixes",
-        ladder: "ladder",
+        ladder: "Ladder",
         full: "Full House",
         poker: "Poker",
         generala: "Generala",
@@ -169,7 +169,7 @@ function renderDice(animate = false) {
 }
 
 // ==========================
-// SCORING LOGIC
+// SCORING LOGIC (Updated with Confirmation)
 // ==========================
 function scoreCategory(cell) {
     const playerIndex = Number(cell.dataset.player);
@@ -181,11 +181,10 @@ function scoreCategory(cell) {
 
     const score = calculateScore(cat);
 
-    if (score === 0) {
-        showConfirmModal(`Are you sure you want to put 0 on ${formatCat(cat)}?`, () => setScore(cell, score));
-    } else {
+    // Show the confirmation modal before scoring
+    showConfirmModal(`Are you sure you want to score ${score} for ${formatCat(cat)}?`, () => {
         setScore(cell, score);
-    }
+    });
 }
 
 function calculateScore(cat) {
@@ -327,26 +326,16 @@ function showConfirmModal(msg, onConfirm) {
     const yesBtn = modal.querySelector("#confirm-yes");
     const noBtn = modal.querySelector("#confirm-no");
 
-    // Check if the message contains the specific prompt about putting 0 (Double Generala)
-    if (msg.includes("Are you sure you want to put 0")) {
-        // Show YES/NO buttons for the "0" confirmation message
-        yesBtn.innerText = "Yes";
-        noBtn.style.display = "inline-block"; // Show "No"
+    // Show YES/NO buttons for the confirmation message
+    yesBtn.innerText = "Yes";
+    noBtn.style.display = "inline-block"; // Show "No"
 
-        yesBtn.onclick = () => {
-            onConfirm(); // Trigger the callback function (set 0)
-            modal.classList.remove("show");
-        };
+    yesBtn.onclick = () => {
+        onConfirm(); // Trigger the callback function (set score)
+        modal.classList.remove("show");
+    };
 
-        noBtn.onclick = () => {
-            modal.classList.remove("show");
-        };
-    } else {
-        // For other messages, hide "No" button and show "OK" only
-        noBtn.style.display = "none";
-        yesBtn.innerText = "OK";
-        yesBtn.onclick = () => {
-            modal.classList.remove("show");
-        };
-    }
+    noBtn.onclick = () => {
+        modal.classList.remove("show"); // Close modal if canceled
+    };
 }
